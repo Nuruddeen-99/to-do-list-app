@@ -1,0 +1,57 @@
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #0f0f0f;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 380px;
+  background-color: #171717;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.confirm-form {
+  text-align: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  color: royalblue;
+  font-weight: 600;
+  margin: 0;
+}
+
+.message {
+  color: #9ca3af;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.submit {
+  height: 42px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 8px auto 0 auto;
+  border-radius: 12px;
+  border: none;
+  width: 100%;
+  outline: none;
+  transition: background-color 0.2s ease-in-out;
+  background-color: royalblue;
+  color: white;
+  cursor: pointer;
+}
+
+.submit:hover {
+  background-color: #3b5bdb;
+}
