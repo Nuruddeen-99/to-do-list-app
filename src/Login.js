@@ -27,6 +27,7 @@ function Login() {
             const response = await axios.post('http://localhost:3001/api/home', formData);
             if (response.status === 200) {
                 const { fname, lname, userId } = response.data;
+                sessionStorage.setItem('todo:auth', 'true');
                 navigate('/New', { state: { fname, lname, userId } });
             } else if (response.status === 203) {
                 setErrorMessage('Incorrect email or password.');

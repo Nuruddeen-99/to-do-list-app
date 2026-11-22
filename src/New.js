@@ -11,6 +11,7 @@ function New() {
   const [curTask, setCurTask] = useState('');
   const [prior, setPriority] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [taskTime, setTaskTime] = useState('');
   const [allTask, setAllTask] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -30,9 +31,15 @@ function New() {
   const generateLocalId = () =>
     `local_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
 
+  // Local YYYY-MM-DD string (avoids UTC off-by-one errors)
+  const getTodayString = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  };
+
   const groupedTasks = useMemo(() => {
     return allTask.reduce((acc, task) => {
-      const groupName = task.group ? task.group.toUpperCase() : 'UNGROUPED';
+      const groupName = task.group ? task.group.toUpperCase() : 'GENERAL';
       acc[groupName] = acc[groupName] || [];
       acc[groupName].push(task);
       return acc;
@@ -58,7 +65,7 @@ function New() {
           deadline: new Date(task.deadline),
           localId: task._id || generateLocalId()
         })));
-        setGroups(groupsRes.data);
+        setGroups(Array.from(new Set(['General', ...groupsRes.data])));
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -72,8 +79,9 @@ function New() {
   const resetForm = () => {
     setCurTask('');
     setDeadline('');
+    setTaskTime('');
     setPriority('');
-    setGroup('');
+    setGroup('General');
     setNewGroup('');
     setEditingId(null);
     setErrorMessage('');
@@ -92,14 +100,16 @@ function New() {
   // Sync state to database and logout
   const handleLogout = async () => {
     if (!userId) {
-      navigate('/');
+      sessionStorage.removeItem('todo:auth');
+      navigate('/', { replace: true });
       return;
     }
 
     setSyncing(true);
     try {
       await axios.post(`${API_URL}/api/tasks/sync/${userId}`, { tasks: allTask });
-      navigate('/');
+      sessionStorage.removeItem('todo:auth');
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Error saving tasks on logout:', error);
       alert('Failed to save changes. Please try logging out again.');
@@ -110,7 +120,12 @@ function New() {
   const btnClick = () => {
     if (!curTask.trim()) return setErrorMessage('Please enter a task title');
     if (!deadline) return setErrorMessage('Please enter a deadline');
+    if (!taskTime) return setErrorMessage('Please enter time');
     if (!prior) return setErrorMessage('Please select a priority');
+    if (Number(prior) < 1 || Number(prior) > 5) return setErrorMessage('Priority must be between 1 and 5');
+    if (new Date(`${deadline}T${taskTime}`) <= new Date()) {
+      return setErrorMessage('Deadline and time cannot be in the past');
+    }
     if (group === '__new__' && !newGroup.trim()) return setErrorMessage('Please enter a new category name');
 
     setErrorMessage('');
@@ -125,6 +140,7 @@ function New() {
       title: curTask.trim(),
       priority: prior,
       deadline: new Date(deadline),
+      time: taskTime,
       completed: false,
       userId,
       group: grp
@@ -143,7 +159,8 @@ function New() {
     setCurTask(task.title);
     setPriority(task.priority);
     setDeadline(task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : '');
-    setGroup(task.group || '');
+    setTaskTime(task.time || '');
+    setGroup(task.group || 'General');
     setEditingId(task.localId);
     setErrorMessage('');
     setShowAddTaskPane(true);
@@ -186,6 +203,15 @@ function New() {
     return `${dayOfWeek}, ${getOrdinal(day)} ${month} ${year}`;
   };
 
+  // Show a stored "HH:MM" time as "h:mm AM/PM"
+  const formatTime = (time) => {
+    if (!time) return '';
+    const [h, m] = time.split(':').map(Number);
+    if (isNaN(h) || isNaN(m)) return time;
+    const period = h >= 12 ? 'PM' : 'AM';
+    return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${period}`;
+  };
+
   const incompleteCount = allTask.filter(task => !task.completed).length;
   const completedCount = allTask.filter(task => task.completed).length;
 
@@ -219,7 +245,11 @@ function New() {
                   />
                 </td>
                 <td className={`task-title ${isCompleted ? 'completed' : ''}`}>{task.title}</td>
-                <td className="task-priority" data-priority={task.priority}>{task.priority}</td>                <td className="task-deadline">{formatDate(task.deadline)}</td>
+                <td className="task-priority" data-priority={task.priority}>{task.priority}</td>
+                <td className="task-deadline">
+                  <span className="deadline-date">{formatDate(task.deadline)}</span>
+                  {task.time && <span className="deadline-time">{formatTime(task.time)}</span>}
+                </td>
                 <td className="task-actions">
                   {!isCompleted && (
                     <button className="edit-btn" title="Edit Task" onClick={() => editTask(task)}>&#x270E;</button>
@@ -288,8 +318,16 @@ function New() {
                   <input
                     type="date"
                     value={deadline}
+                    min={getTodayString()}
                     onChange={(e) => setDeadline(e.target.value)}
                     className="task-deadline-input"
+                  />
+
+                  <label className="field-label">Time</label>
+                  <input
+                    type="time"
+                    value={taskTime}
+                    onChange={(e) => setTaskTime(e.target.value)}
                   />
 
                   <label className="field-label">Task</label>
@@ -357,7 +395,7 @@ function New() {
             <div className="task-list">
               {allTask.length === 0 ? (
                 <div className="empty-state">
-                  <p>No tasks yet. Click "Add New Task" to get started!</p>
+                  <p>No tasks yet.  Add New Task to get started!</p>
                 </div>
               ) : (
                 <table className="taskTable">

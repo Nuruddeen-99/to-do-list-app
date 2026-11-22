@@ -30,9 +30,10 @@ const taskSchema = new mongoose.Schema({
   title: String,
   priority: String,
   deadline: Date,
+  time: String,
   completed: Boolean,
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Login' }, // Link to User
-  group: { type: String, default: 'Default' }
+  group: { type: String, default: 'General' }
 });
 const Task = mongoose.model('Task', taskSchema);
 
@@ -84,9 +85,9 @@ app.get('/api/tasks/:userId', (req, res) => {
 
 // Route to add a new task
 app.post('/api/tasks', (req, res) => {
-  const { title, priority, deadline, completed, userId, group } = req.body;
+  const { title, priority, deadline, time, completed, userId, group } = req.body;
 
-  const newTask = new Task({ title, priority, deadline, completed, userId, group });
+  const newTask = new Task({ title, priority, deadline, time, completed, userId, group });
   newTask.save()
     .then(task => res.json(task))  // Return the created task object
     .catch(err => res.status(400).json('Error: ' + err));
@@ -94,13 +95,13 @@ app.post('/api/tasks', (req, res) => {
 
 // Route to update an existing task
 app.put('/api/tasks/:id', async (req, res) => {
-  const { title, priority, deadline, completed, group } = req.body;
+  const { title, priority, deadline, time, completed, group } = req.body;
   const { id } = req.params; // Get the task ID from the URL parameters
 
   try {
     const updatedTask = await Task.findByIdAndUpdate(
       id,
-      { title, priority, deadline, completed, group }, // Updated data
+      { title, priority, deadline, time, completed, group }, // Updated data
       { new: true } // Return the updated document
     );
     res.json(updatedTask); // Return the updated task
@@ -136,9 +137,10 @@ app.post('/api/tasks/sync/:userId', async (req, res) => {
       title: task.title,
       priority: task.priority,
       deadline: task.deadline,
+      time: task.time || '',
       completed: task.completed,
       userId,
-      group: task.group || 'Default'
+      group: task.group || 'General'
     }));
 
     if (tasksToInsert.length > 0) {

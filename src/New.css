@@ -292,8 +292,8 @@
 
 /* Group headers */
 .group-header td {
-  padding: 12px 10px;
-  font-size: 0.9rem;
+  padding: 8px 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-align: left;
@@ -345,9 +345,27 @@
 }
 
 .task-deadline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 4px;
   color: #9ca3af;
-  font-size: 0.85rem;
+  font-size: 0.72rem;
+  line-height: 1.1;
   white-space: nowrap;
+}
+
+.deadline-date{
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.deadline-time {
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .task-actions {
@@ -471,9 +489,9 @@
 .taskCheckbox {
   appearance: none;
   -webkit-appearance: none;
-  width: 8px;
-  height: 8px;
-  border: 2px solid #4b5563;
+  width: 6px;
+  height: 6px;
+  border: 1px solid #4b5563;
   border-radius: 5px;
   background-color: #262626;
   cursor: pointer;
@@ -497,7 +515,6 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -52%);
-  font-size: 10.5px;
   font-weight: 700;
   color: white;
   line-height: 1;
@@ -505,7 +522,7 @@
 
 /* ===== Empty / loading states ===== */
 .empty-state {
-  padding: 60px 20px;
+  padding: 110px 20px;
   text-align: center;
   color: #6b7280;
   font-size: 1rem;
