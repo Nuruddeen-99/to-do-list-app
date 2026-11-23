@@ -6,6 +6,7 @@ import axios from 'axios';
 function Login() {
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState('');
+    const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({ email: '', password: '' });
 
     const handleChange = (e) => {
@@ -23,7 +24,11 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitting(true);
+        setErrorMessage('');
         try {
+            // Brief pause so the button spinner is visible before navigating
+            await new Promise(resolve => setTimeout(resolve, 1000));
             const response = await axios.post('http://localhost:3001/api/home', formData);
             if (response.status === 200) {
                 const { fname, lname, userId } = response.data;
@@ -35,6 +40,8 @@ function Login() {
         } catch (error) {
             console.error('Error during login:', error);
             setErrorMessage('Login failed. Please try again.');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -73,7 +80,10 @@ function Login() {
                     />
                 </div>
                 {errorMessage && <p className="error-msg">{errorMessage}</p>}
-                <button className="button1" type="submit">Login</button>
+                <button className="button1" type="submit" disabled={submitting}>
+                    {submitting && <span className="button-spinner" aria-hidden="true"></span>}
+                    Login
+                </button>
                 <p className="auth-link">
                     Don't have an account? Sign up <Link to="/Signup">here</Link>
                 </p>

@@ -6,6 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 function Signup() {
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState('');
+    const [submitting, setSubmitting] = useState(false);
     // State to handle form inputs
     const [formData, setFormData] = useState({
         firstName: '',
@@ -27,13 +28,16 @@ function Signup() {
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.password !== formData.confirmPassword) {
-            setErrorMessage('Passwords do not match!');
-            return;
-        }
+        setSubmitting(true);
         setErrorMessage('');
-
         try {
+            // Brief pause so the button spinner is visible before navigating
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (formData.password !== formData.confirmPassword) {
+                setErrorMessage('Passwords do not match!');
+                return;
+            }
+
             // Send data to the server
             const response = await axios.post('http://localhost:3001/api/signup', {
                 firstName: formData.firstName,
@@ -50,6 +54,8 @@ function Signup() {
             console.error('Error during signup:', error);
             const serverMessage = error.response && error.response.data;
             setErrorMessage(typeof serverMessage === 'string' ? serverMessage : 'Signup failed. Please try again.');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -125,7 +131,10 @@ function Signup() {
                     <span>Confirm Password</span>
                 </label>
                 {errorMessage && <p className="error-msg">{errorMessage}</p>}
-                <button className="submit" type="submit">Create Account</button>
+                <button className="submit" type="submit" disabled={submitting}>
+                    {submitting && <span className="button-spinner" aria-hidden="true"></span>}
+                    Create Account
+                </button>
                 <p className="signin">Already have an account? <Link to="/">Login</Link></p>
             </form>
         </div>
