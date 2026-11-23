@@ -5,7 +5,10 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: process.env.CLIENT_URL || true }));
+
+// Simple health check for Render
+app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
 // MongoDB connection
 if (!process.env.MONGODB_URI) {
@@ -154,5 +157,5 @@ app.post('/api/tasks/sync/:userId', async (req, res) => {
   }
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

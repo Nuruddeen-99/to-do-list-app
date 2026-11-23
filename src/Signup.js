@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import './Signup.css';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { API_URL } from './config';
 
 function Signup() {
     const navigate = useNavigate();
@@ -39,7 +40,7 @@ function Signup() {
             }
 
             // Send data to the server
-            const response = await axios.post('http://localhost:3001/api/signup', {
+            const response = await axios.post(`${API_URL}/api/signup`, {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,

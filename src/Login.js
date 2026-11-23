@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 import axios from 'axios';
+import { API_URL } from './config';
 
 function Login() {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ function Login() {
         try {
             // Brief pause so the button spinner is visible before navigating
             await new Promise(resolve => setTimeout(resolve, 1000));
-            const response = await axios.post('http://localhost:3001/api/home', formData);
+            const response = await axios.post(`${API_URL}/api/home`, formData);
             if (response.status === 200) {
                 const { fname, lname, userId } = response.data;
                 sessionStorage.setItem('todo:auth', 'true');
