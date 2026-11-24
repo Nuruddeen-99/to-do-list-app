@@ -34,7 +34,7 @@ function Login() {
             if (response.status === 200) {
                 const { fname, lname, userId } = response.data;
                 sessionStorage.setItem('todo:auth', 'true');
-                navigate('/New', { state: { fname, lname, userId } });
+                navigate('/dashboard', { state: { fname, lname, userId } });
             } else if (response.status === 203) {
                 setErrorMessage('Incorrect email or password.');
             }

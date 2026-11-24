@@ -18,10 +18,10 @@ function App() {
     <>
         <Routes>
           <Route path="/" element={<Login />}/>
-          <Route path="/Signup" element={<Signup />}/>
-          <Route path="/Main" element={<Main />}/>
-          <Route path="/New" element={<RequireAuth><New /></RequireAuth>} />
-          <Route path="/Confirm" element={<Confirm />}/>
+          <Route path="/signup" element={<Signup />}/>
+          <Route path="/main" element={<Main />}/>
+          <Route path="/dashboard" element={<RequireAuth><New /></RequireAuth>} />
+          <Route path="/confirm" element={<Confirm />}/>
         </Routes>
           </>
     );

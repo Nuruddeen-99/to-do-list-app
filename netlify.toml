@@ -2,7 +2,7 @@
   command = "npm run build"
   publish = "build"
 
-# Let React Router handle client-side routes (e.g. /Signup, /New, /Confirm)
+# Let React Router handle client-side routes (e.g. /signup, /dashboard, /confirm)
 [[redirects]]
   from = "/*"
   to = "/index.html"

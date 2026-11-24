@@ -49,7 +49,7 @@ function Signup() {
 
             if (response.status === 200) {
                 // Redirect to the confirmation page
-                navigate('/Confirm');
+                navigate('/confirm');
             }
         } catch (error) {
             console.error('Error during signup:', error);
